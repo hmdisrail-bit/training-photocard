@@ -45,57 +45,200 @@ footer{text-align:center;margin-top:16px;font-size:12px;color:#728573}
 </section>
 <footer>প্রশিক্ষণ সম্মেলন ২০২৬</footer>
 </main>
-<script>
-const upload=document.getElementById('upload'), canvas=document.getElementById('canvas'), ctx=canvas.getContext('2d');
-const zoom=document.getElementById('zoom'), zoomValue=document.getElementById('zoomValue');
-const download=document.getElementById('download'), reset=document.getElementById('reset'), clear=document.getElementById('clear');
-const frame=new Image(); frame.src='frame.png';
-const logo=new Image(); logo.src='logo-clear.png';
-let photo=null, scale=1, baseScale=1, offsetX=0, offsetY=0, dragging=false, lastX=0, lastY=0;
-const W=1536,H=1536, CX=768,CY=700,RX=535,RY=525;
+
+const upload=document.getElementById('upload');
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+const zoom=document.getElementById('zoom');
+const zoomValue=document.getElementById('zoomValue');
+const download=document.getElementById('download');
+const reset=document.getElementById('reset');
+const clear=document.getElementById('clear');
+
+let photo=null, processedFrame=null;
+let scale=1, offsetX=0, offsetY=0;
+let dragging=false, lastX=0, lastY=0;
+
+const W=1536,H=1536;
+const CX=768,CY=610,RX=485,RY=420;
+
+const frame=new Image();
+frame.onload=()=>{
+  const temp=document.createElement('canvas');
+  temp.width=frame.naturalWidth;
+  temp.height=frame.naturalHeight;
+  const tctx=temp.getContext('2d',{willReadFrequently:true});
+  tctx.drawImage(frame,0,0);
+
+  const imageData=tctx.getImageData(0,0,temp.width,temp.height);
+  const data=imageData.data;
+
+  for(let y=0;y<temp.height;y++){
+    for(let x=0;x<temp.width;x++){
+      const dx=(x-CX)/490;
+      const dy=(y-CY)/430;
+      const inside=dx*dx+dy*dy<1;
+
+      const i=(y*temp.width+x)*4;
+      const r=data[i],g=data[i+1],b=data[i+2];
+      const white=r>238 && g>238 && b>238 &&
+        Math.max(r,g,b)-Math.min(r,g,b)<20;
+
+      if(inside && white) data[i+3]=0;
+    }
+  }
+
+  tctx.putImageData(imageData,0,0);
+  processedFrame=temp;
+  draw();
+};
+frame.src='frame.png';
+
+const logo=new Image();
+logo.onload=draw;
+logo.src='logo-clear.png';
+
 function draw(){
- const cw=canvas.width,ch=canvas.height; ctx.clearRect(0,0,cw,ch);
- // Scale design coordinates into preview canvas.
- ctx.save(); ctx.scale(cw/W,ch/H);
- if(photo){
-   ctx.save(); ctx.beginPath(); ctx.ellipse(CX,CY,RX,RY,0,0,Math.PI*2); ctx.clip();
-   const cover=Math.max(W/photo.width,H/photo.height)*.70;
-   const s=cover*scale;
-   const dw=photo.width*s, dh=photo.height*s;
-   const dx=(W-dw)/2+offsetX, dy=(H-dh)/2+offsetY;
-   ctx.drawImage(photo,dx,dy,dw,dh); ctx.restore();
- }
- if(frame.complete && frame.naturalWidth) ctx.drawImage(frame,0,0,W,H);
- if(logo.complete && logo.naturalWidth) ctx.drawImage(logo,0,0,400,400);
- ctx.restore();
+  const cw=canvas.width,ch=canvas.height;
+  ctx.clearRect(0,0,cw,ch);
+  ctx.save();
+  ctx.scale(cw/W,ch/H);
+
+  if(photo){
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(CX,CY,RX,RY,0,0,Math.PI*2);
+    ctx.clip();
+
+    const cover=Math.max(
+      (RX*2)/photo.width,
+      (RY*2)/photo.height
+    );
+    const s=cover*scale;
+    const dw=photo.width*s;
+    const dh=photo.height*s;
+    const dx=CX-dw/2+offsetX;
+    const dy=CY-dh/2+offsetY;
+
+    ctx.drawImage(photo,dx,dy,dw,dh);
+    ctx.restore();
+  }
+
+  if(processedFrame){
+    ctx.drawImage(processedFrame,0,0,W,H);
+  }
+  if(logo.complete && logo.naturalWidth){
+    ctx.drawImage(logo,0,0,400,400);
+  }
+
+  ctx.restore();
 }
+
 function fitCanvas(){
- const box=canvas.getBoundingClientRect();
- const ratio=window.devicePixelRatio||1;
- const size=Math.min(900,Math.max(320,Math.round(box.width*ratio)));
- canvas.width=size; canvas.height=size; draw();
+  const box=canvas.getBoundingClientRect();
+  const ratio=window.devicePixelRatio||1;
+  const size=Math.min(900,Math.max(320,Math.round(box.width*ratio)));
+  canvas.width=size;
+  canvas.height=size;
+  draw();
 }
-frame.onload=draw; logo.onload=draw;
+
 upload.addEventListener('change',e=>{
- const file=e.target.files&&e.target.files[0]; if(!file)return;
- if(!file.type.startsWith('image/')){alert('অনুগ্রহ করে একটি ছবি নির্বাচন করুন।');return;}
- const url=URL.createObjectURL(file), img=new Image();
- img.onload=()=>{photo=img;scale=1;offsetX=0;offsetY=0;zoom.value=1;zoomValue.textContent='1.0×';download.disabled=false;reset.disabled=false;clear.disabled=false;draw();URL.revokeObjectURL(url);};
- img.onerror=()=>{alert('ছবিটি খোলা যাচ্ছে না। অন্য ছবি দিন।');URL.revokeObjectURL(url);};
- img.src=url;
+  const file=e.target.files&&e.target.files[0];
+  if(!file)return;
+
+  if(!file.type.startsWith('image/')){
+    alert('অনুগ্রহ করে একটি ছবি নির্বাচন করুন।');
+    return;
+  }
+
+  const url=URL.createObjectURL(file);
+  const img=new Image();
+
+  img.onload=()=>{
+    photo=img;
+    scale=1;
+    offsetX=0;
+    offsetY=0;
+    zoom.value=1;
+    zoomValue.textContent='1.0×';
+    download.disabled=false;
+    reset.disabled=false;
+    clear.disabled=false;
+    draw();
+    URL.revokeObjectURL(url);
+  };
+
+  img.onerror=()=>{
+    alert('ছবিটি খোলা যাচ্ছে না। অন্য ছবি দিন।');
+    URL.revokeObjectURL(url);
+  };
+
+  img.src=url;
 });
-zoom.addEventListener('input',()=>{scale=Number(zoom.value);zoomValue.textContent=scale.toFixed(1)+'×';draw();});
-function point(e){const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*canvas.width/r.width*(W/canvas.width),y:(e.clientY-r.top)*canvas.height/r.height*(H/canvas.height)};}
-canvas.addEventListener('pointerdown',e=>{if(!photo)return;dragging=true;canvas.setPointerCapture(e.pointerId);const p=point(e);lastX=p.x;lastY=p.y;});
-canvas.addEventListener('pointermove',e=>{if(!dragging)return;const p=point(e);offsetX+=(p.x-lastX);offsetY+=(p.y-lastY);lastX=p.x;lastY=p.y;draw();});
-canvas.addEventListener('pointerup',()=>dragging=false);canvas.addEventListener('pointercancel',()=>dragging=false);
-reset.addEventListener('click',()=>{scale=1;offsetX=0;offsetY=0;zoom.value=1;zoomValue.textContent='1.0×';draw();});
-clear.addEventListener('click',()=>{photo=null;upload.value='';download.disabled=true;reset.disabled=true;clear.disabled=true;draw();});
+
+zoom.addEventListener('input',()=>{
+  scale=Number(zoom.value);
+  zoomValue.textContent=scale.toFixed(1)+'×';
+  draw();
+});
+
+function point(e){
+  const r=canvas.getBoundingClientRect();
+  return {
+    x:(e.clientX-r.left)*W/r.width,
+    y:(e.clientY-r.top)*H/r.height
+  };
+}
+
+canvas.addEventListener('pointerdown',e=>{
+  if(!photo)return;
+  dragging=true;
+  canvas.setPointerCapture(e.pointerId);
+  const p=point(e);
+  lastX=p.x;
+  lastY=p.y;
+});
+
+canvas.addEventListener('pointermove',e=>{
+  if(!dragging)return;
+  const p=point(e);
+  offsetX+=p.x-lastX;
+  offsetY+=p.y-lastY;
+  lastX=p.x;
+  lastY=p.y;
+  draw();
+});
+
+canvas.addEventListener('pointerup',()=>dragging=false);
+canvas.addEventListener('pointercancel',()=>dragging=false);
+
+reset.addEventListener('click',()=>{
+  scale=1;
+  offsetX=0;
+  offsetY=0;
+  zoom.value=1;
+  zoomValue.textContent='1.0×';
+  draw();
+});
+
+clear.addEventListener('click',()=>{
+  photo=null;
+  upload.value='';
+  download.disabled=true;
+  reset.disabled=true;
+  clear.disabled=true;
+  draw();
+});
+
 download.addEventListener('click',()=>{
- if(!photo)return;
- const a=document.createElement('a');a.download='training-conference-2026-photocard.jpg';
- a.href=canvas.toDataURL('image/jpeg',.94);a.click();
+  if(!photo)return;
+  const a=document.createElement('a');
+  a.download='training-conference-2026-photocard.jpg';
+  a.href=canvas.toDataURL('image/jpeg',.94);
+  a.click();
 });
-window.addEventListener('resize',fitCanvas);fitCanvas();
-</script>
+
+window.addEventListener('resize',fitCanvas);
+fitCanvas()
 </body></html>
