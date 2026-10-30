@@ -1,230 +1,609 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="bn">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#16852b">
+
 <title>প্রশিক্ষণ সম্মেলন ২০২৬ — ফটোকার্ড</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f2f8ef;color:#17351d;font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif}
-main{max-width:620px;margin:auto;padding:22px 15px 36px}
-header{text-align:center;margin:5px 0 18px}h1{font-size:25px;margin:0 0 7px;color:#14762a}p{margin:0;color:#55705a;font-size:14px;line-height:1.6}
-.panel{background:white;border:1px solid #dcebd9;border-radius:18px;padding:15px;box-shadow:0 5px 22px #245b2410}
-input[type=file]{display:block;width:100%;padding:12px;border:1px dashed #91bd8d;border-radius:12px;background:#f8fcf6}
-.preview{margin:14px auto 10px;max-width:100%;width:100%;display:block;border-radius:12px;background:#f7faf5}
-.controls{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin:12px 0}
-label{font-size:14px;font-weight:600}input[type=range]{width:100%;accent-color:#16852b}
-button{border:0;border-radius:12px;padding:13px 16px;font-size:16px;font-weight:700;cursor:pointer}
-.primary{width:100%;background:#16852b;color:white}.secondary{background:#e9f4e7;color:#176a27}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-button:disabled{opacity:.45;cursor:not-allowed}
-.hint{font-size:12px;color:#657b68;margin-top:9px}
-footer{text-align:center;margin-top:16px;font-size:12px;color:#728573}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f2f8ef;
+  color: #17351d;
+  font-family: system-ui, -apple-system, "Noto Sans Bengali", sans-serif;
+}
+
+main {
+  max-width: 620px;
+  margin: auto;
+  padding: 22px 15px 36px;
+}
+
+header {
+  text-align: center;
+  margin: 5px 0 18px;
+}
+
+h1 {
+  font-size: 25px;
+  margin: 0 0 7px;
+  color: #14762a;
+}
+
+p {
+  margin: 0;
+  color: #55705a;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.panel {
+  background: white;
+  border: 1px solid #dcebd9;
+  border-radius: 18px;
+  padding: 15px;
+  box-shadow: 0 5px 22px #245b2410;
+}
+
+input[type=file] {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 1px dashed #91bd8d;
+  border-radius: 12px;
+  background: #f8fcf6;
+}
+
+.preview {
+  margin: 14px auto 10px;
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+  background: #f7faf5;
+  touch-action: none;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  margin: 12px 0;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+input[type=range] {
+  width: 100%;
+  accent-color: #16852b;
+}
+
+button {
+  border: 0;
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary {
+  width: 100%;
+  background: #16852b;
+  color: white;
+}
+
+.secondary {
+  background: #e9f4e7;
+  color: #176a27;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.hint {
+  font-size: 12px;
+  color: #657b68;
+  margin-top: 9px;
+}
+
+footer {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 12px;
+  color: #728573;
+}
+
+#status {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 13px;
+  color: #a04a18;
+}
 </style>
 </head>
+
 <body>
 <main>
+
 <header>
-<h1>প্রশিক্ষণ সম্মেলন ২০২৬</h1>
-<p>আপনার ছবি যোগ করে নিজের ফটোকার্ড তৈরি করুন</p>
+  <h1>প্রশিক্ষণ সম্মেলন ২০২৬</h1>
+  <p>আপনার ছবি যোগ করে নিজের ফটোকার্ড তৈরি করুন</p>
 </header>
+
 <section class="panel">
-<input id="upload" type="file" accept="image/*">
-<canvas id="canvas" class="preview" width="768" height="768" aria-label="ফটোকার্ড প্রিভিউ"></canvas>
-<div class="controls">
-<label for="zoom">ছবির জুম</label><span id="zoomValue">1.0×</span>
-<input id="zoom" type="range" min="1" max="2.5" step=".01" value="1" style="grid-column:1/3">
-</div>
-<p class="hint">ছবিটি প্রিভিউয়ের ওপর আঙুল/মাউস দিয়ে টেনে নিজের মতো করে বসান। জুম স্লাইডার দিয়ে আকার ঠিক করুন।</p>
-<div class="actions">
-<button class="secondary" id="reset" disabled>ছবি ঠিক করুন</button>
-<button class="secondary" id="clear" disabled>ছবি বদলান</button>
-</div>
-<button class="primary" id="download" disabled style="margin-top:10px">ফটোকার্ড ডাউনলোড করুন</button>
-<p class="hint">আপনার ছবি এই ডিভাইসের ব্রাউজারেই প্রসেস হয়; কোনো সার্ভারে আপলোড করা হয় না।</p>
+
+  <input id="upload" type="file" accept="image/*">
+
+  <canvas
+    id="canvas"
+    class="preview"
+    width="768"
+    height="768"
+    aria-label="ফটোকার্ড প্রিভিউ">
+  </canvas>
+
+  <div id="status">ফটোকার্ড লোড হচ্ছে...</div>
+
+  <div class="controls">
+    <label for="zoom">ছবির জুম</label>
+    <span id="zoomValue">1.0×</span>
+
+    <input
+      id="zoom"
+      type="range"
+      min="1"
+      max="2.5"
+      step=".01"
+      value="1"
+      style="grid-column:1/3">
+  </div>
+
+  <p class="hint">
+    ছবিটি প্রিভিউয়ের ওপর আঙুল বা মাউস দিয়ে টেনে নিজের মতো করে বসান।
+    জুম স্লাইডার দিয়ে ছবির আকার ঠিক করুন।
+  </p>
+
+  <div class="actions">
+    <button class="secondary" id="reset" disabled>
+      ছবি ঠিক করুন
+    </button>
+
+    <button class="secondary" id="clear" disabled>
+      ছবি বদলান
+    </button>
+  </div>
+
+  <button
+    class="primary"
+    id="download"
+    disabled
+    style="margin-top:10px">
+    ফটোকার্ড ডাউনলোড করুন
+  </button>
+
+  <p class="hint">
+    আপনার ছবি এই ডিভাইসের ব্রাউজারেই প্রসেস হয়;
+    কোনো সার্ভারে আপলোড করা হয় না।
+  </p>
+
 </section>
+
 <footer>প্রশিক্ষণ সম্মেলন ২০২৬</footer>
 </main>
 
-const upload=document.getElementById('upload');
-const canvas=document.getElementById('canvas');
-const ctx=canvas.getContext('2d');
-const zoom=document.getElementById('zoom');
-const zoomValue=document.getElementById('zoomValue');
-const download=document.getElementById('download');
-const reset=document.getElementById('reset');
-const clear=document.getElementById('clear');
+<script>
+"use strict";
 
-let photo=null, processedFrame=null;
-let scale=1, offsetX=0, offsetY=0;
-let dragging=false, lastX=0, lastY=0;
+// ===============================
+// প্রয়োজনীয় উপাদান
+// ===============================
 
-const W=1536,H=1536;
-const CX=768,CY=610,RX=485,RY=420;
+const upload = document.getElementById("upload");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-const frame = new Image();
+const zoom = document.getElementById("zoom");
+const zoomValue = document.getElementById("zoomValue");
 
-frame.onload = function() {
+const download = document.getElementById("download");
+const reset = document.getElementById("reset");
+const clear = document.getElementById("clear");
+const status = document.getElementById("status");
+
+// ===============================
+// ফ্রেমের মাপ
+// ===============================
+
+const W = 1536;
+const H = 1536;
+
+// ছবির গোলাকার অংশের অবস্থান ও মাপ
+const CX = 768;
+const CY = 610;
+const RX = 485;
+const RY = 420;
+
+let photo = null;
+let frameReady = false;
+let logoReady = false;
+
+let scale = 1;
+let offsetX = 0;
+let offsetY = 0;
+
+let dragging = false;
+let lastX = 0;
+let lastY = 0;
+
+// ===============================
+// ফ্রেম লোড ও সাদা অংশ স্বচ্ছ করা
+// ===============================
+
+const frameImage = new Image();
+
+frameImage.onload = function () {
+  try {
+    const temp = document.createElement("canvas");
+    temp.width = W;
+    temp.height = H;
+
+    const tctx = temp.getContext("2d", {
+      willReadFrequently: true
+    });
+
+    tctx.drawImage(frameImage, 0, 0, W, H);
+
+    const imageData = tctx.getImageData(0, 0, W, H);
+    const pixels = imageData.data;
+
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+
+        const dx = (x - CX) / RX;
+        const dy = (y - CY) / RY;
+
+        const inside = dx * dx + dy * dy < 0.94;
+
+        if (!inside) continue;
+
+        const i = (y * W + x) * 4;
+
+        const r = pixels[i];
+        const g = pixels[i + 1];
+        const b = pixels[i + 2];
+
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+
+        // শুধু গোলাকার জায়গার কাছাকাছি সাদা পিক্সেল স্বচ্ছ হবে
+        const isWhite =
+          r > 235 &&
+          g > 235 &&
+          b > 235 &&
+          (max - min) < 22;
+
+        if (isWhite) {
+          pixels[i + 3] = 0;
+        }
+      }
+    }
+
+    tctx.putImageData(imageData, 0, 0);
+
+    frameReady = true;
+    processedFrame = temp;
+
+    status.textContent = "ফটোকার্ড প্রস্তুত। ছবি আপলোড করুন।";
+    draw();
+
+  } catch (error) {
+    console.error(error);
+    status.textContent =
+      "ফ্রেম প্রস্তুত করা যায়নি। frame.png পরীক্ষা করুন।";
+  }
+};
+
+frameImage.onerror = function () {
+  status.textContent =
+    "ফ্রেম লোড হয়নি। GitHub-এ frame.png ফাইলটি পরীক্ষা করুন।";
+};
+
+let processedFrame = null;
+
+frameImage.src = "./frame.png";
+
+// ===============================
+// লোগো লোড
+// ===============================
+
+const logo = new Image();
+
+logo.onload = function () {
+  logoReady = true;
   draw();
 };
 
-frame.onerror = function() {
-  alert("ফ্রেমের ছবি লোড হচ্ছে না। frame.png ফাইলটি পরীক্ষা করুন।");
-};
-
-frame.src = './frame.png';
-
-  tctx.putImageData(imageData,0,0);
-  processedFrame=temp;
+logo.onerror = function () {
+  console.warn("logo-clear.png পাওয়া যায়নি।");
   draw();
 };
-frame.src='frame.png';
 
-const logo=new Image();
-logo.onload=draw;
-logo.src='logo-clear.png';
+logo.src = "./logo-clear.png";
 
-function draw(){
-  const cw=canvas.width,ch=canvas.height;
-  ctx.clearRect(0,0,cw,ch);
+// ===============================
+// ছবি আঁকার ফাংশন
+// ===============================
+
+function draw() {
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   ctx.save();
-  ctx.scale(cw/W,ch/H);
+  ctx.scale(canvas.width / W, canvas.height / H);
 
-  if(photo){
+  // প্রথমে ব্যবহারকারীর ছবি
+  if (photo) {
+
     ctx.save();
+
     ctx.beginPath();
-    ctx.ellipse(CX,CY,RX,RY,0,0,Math.PI*2);
+    ctx.ellipse(CX, CY, RX, RY, 0, 0, Math.PI * 2);
     ctx.clip();
 
-    const cover=Math.max(
-      (RX*2)/photo.width,
-      (RY*2)/photo.height
+    const cover = Math.max(
+      (RX * 2) / photo.width,
+      (RY * 2) / photo.height
     );
-    const s=cover*scale;
-    const dw=photo.width*s;
-    const dh=photo.height*s;
-    const dx=CX-dw/2+offsetX;
-    const dy=CY-dh/2+offsetY;
 
-    ctx.drawImage(photo,dx,dy,dw,dh);
+    const s = cover * scale;
+
+    const dw = photo.width * s;
+    const dh = photo.height * s;
+
+    const dx = CX - dw / 2 + offsetX;
+    const dy = CY - dh / 2 + offsetY;
+
+    ctx.drawImage(photo, dx, dy, dw, dh);
+
     ctx.restore();
   }
 
-  if(processedFrame){
-    ctx.drawImage(processedFrame,0,0,W,H);
+  // ছবির ওপর ফ্রেম আঁকা হবে
+  if (frameReady && processedFrame) {
+    ctx.drawImage(processedFrame, 0, 0, W, H);
   }
-  if(logo.complete && logo.naturalWidth){
-    ctx.drawImage(logo,0,0,400,400);
+
+  // আলাদা পরিষ্কার লোগো
+  if (logoReady) {
+    ctx.drawImage(logo, 0, 0, 400, 400);
   }
 
   ctx.restore();
 }
 
-function fitCanvas(){
-  const box=canvas.getBoundingClientRect();
-  const ratio=window.devicePixelRatio||1;
-  const size=Math.min(900,Math.max(320,Math.round(box.width*ratio)));
-  canvas.width=size;
-  canvas.height=size;
-  draw();
-}
+// ===============================
+// ছবি আপলোড
+// ===============================
 
-upload.addEventListener('change',e=>{
-  const file=e.target.files&&e.target.files[0];
-  if(!file)return;
+upload.addEventListener("change", function (e) {
 
-  if(!file.type.startsWith('image/')){
-    alert('অনুগ্রহ করে একটি ছবি নির্বাচন করুন।');
+  const file = e.target.files[0];
+
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("অনুগ্রহ করে একটি ছবি নির্বাচন করুন।");
     return;
   }
 
-  const url=URL.createObjectURL(file);
-  const img=new Image();
+  const url = URL.createObjectURL(file);
+  const img = new Image();
 
-  img.onload=()=>{
-    photo=img;
-    scale=1;
-    offsetX=0;
-    offsetY=0;
-    zoom.value=1;
-    zoomValue.textContent='1.0×';
-    download.disabled=false;
-    reset.disabled=false;
-    clear.disabled=false;
+  img.onload = function () {
+
+    photo = img;
+
+    scale = 1;
+    offsetX = 0;
+    offsetY = 0;
+
+    zoom.value = 1;
+    zoomValue.textContent = "1.0×";
+
+    download.disabled = false;
+    reset.disabled = false;
+    clear.disabled = false;
+
+    status.textContent = "ছবি প্রস্তুত। এখন অবস্থান ঠিক করুন।";
+
     draw();
+
     URL.revokeObjectURL(url);
   };
 
-  img.onerror=()=>{
-    alert('ছবিটি খোলা যাচ্ছে না। অন্য ছবি দিন।');
+  img.onerror = function () {
+    alert("ছবিটি খোলা যাচ্ছে না। অন্য ছবি নির্বাচন করুন।");
     URL.revokeObjectURL(url);
   };
 
-  img.src=url;
+  img.src = url;
 });
 
-zoom.addEventListener('input',()=>{
-  scale=Number(zoom.value);
-  zoomValue.textContent=scale.toFixed(1)+'×';
+// ===============================
+// জুম নিয়ন্ত্রণ
+// ===============================
+
+zoom.addEventListener("input", function () {
+
+  scale = Number(zoom.value);
+
+  zoomValue.textContent = scale.toFixed(1) + "×";
+
   draw();
 });
 
-function point(e){
-  const r=canvas.getBoundingClientRect();
+// ===============================
+// টেনে ছবি সরানো
+// ===============================
+
+function getPoint(e) {
+
+  const rect = canvas.getBoundingClientRect();
+
   return {
-    x:(e.clientX-r.left)*W/r.width,
-    y:(e.clientY-r.top)*H/r.height
+    x: (e.clientX - rect.left) * W / rect.width,
+    y: (e.clientY - rect.top) * H / rect.height
   };
 }
 
-canvas.addEventListener('pointerdown',e=>{
-  if(!photo)return;
-  dragging=true;
+canvas.addEventListener("pointerdown", function (e) {
+
+  if (!photo) return;
+
+  dragging = true;
+
   canvas.setPointerCapture(e.pointerId);
-  const p=point(e);
-  lastX=p.x;
-  lastY=p.y;
+
+  const p = getPoint(e);
+
+  lastX = p.x;
+  lastY = p.y;
 });
 
-canvas.addEventListener('pointermove',e=>{
-  if(!dragging)return;
-  const p=point(e);
-  offsetX+=p.x-lastX;
-  offsetY+=p.y-lastY;
-  lastX=p.x;
-  lastY=p.y;
+canvas.addEventListener("pointermove", function (e) {
+
+  if (!dragging) return;
+
+  const p = getPoint(e);
+
+  offsetX += p.x - lastX;
+  offsetY += p.y - lastY;
+
+  lastX = p.x;
+  lastY = p.y;
+
   draw();
 });
 
-canvas.addEventListener('pointerup',()=>dragging=false);
-canvas.addEventListener('pointercancel',()=>dragging=false);
+canvas.addEventListener("pointerup", function () {
+  dragging = false;
+});
 
-reset.addEventListener('click',()=>{
-  scale=1;
-  offsetX=0;
-  offsetY=0;
-  zoom.value=1;
-  zoomValue.textContent='1.0×';
+canvas.addEventListener("pointercancel", function () {
+  dragging = false;
+});
+
+// ===============================
+// রিসেট
+// ===============================
+
+reset.addEventListener("click", function () {
+
+  scale = 1;
+  offsetX = 0;
+  offsetY = 0;
+
+  zoom.value = 1;
+  zoomValue.textContent = "1.0×";
+
   draw();
 });
 
-clear.addEventListener('click',()=>{
-  photo=null;
-  upload.value='';
-  download.disabled=true;
-  reset.disabled=true;
-  clear.disabled=true;
+// ===============================
+// ছবি পরিবর্তন
+// ===============================
+
+clear.addEventListener("click", function () {
+
+  photo = null;
+  upload.value = "";
+
+  download.disabled = true;
+  reset.disabled = true;
+  clear.disabled = true;
+
+  status.textContent = "নতুন ছবি আপলোড করুন।";
+
   draw();
 });
 
-download.addEventListener('click',()=>{
-  if(!photo)return;
-  const a=document.createElement('a');
-  a.download='training-conference-2026-photocard.jpg';
-  a.href=canvas.toDataURL('image/jpeg',.94);
+// ===============================
+// JPG ডাউনলোড
+// ===============================
+
+download.addEventListener("click", function () {
+
+  if (!photo || !frameReady) {
+    alert("ছবি ও ফ্রেম প্রস্তুত হওয়ার পর ডাউনলোড করুন।");
+    return;
+  }
+
+  const output = document.createElement("canvas");
+
+  output.width = W;
+  output.height = H;
+
+  const outCtx = output.getContext("2d");
+
+  // JPG-এর স্বচ্ছ অংশ সাদা ব্যাকগ্রাউন্ড হবে
+  outCtx.fillStyle = "#ffffff";
+  outCtx.fillRect(0, 0, W, H);
+
+  outCtx.drawImage(
+    canvas,
+    0, 0, canvas.width, canvas.height,
+    0, 0, W, H
+  );
+
+  const a = document.createElement("a");
+
+  a.download = "training-conference-2026-photocard.jpg";
+  a.href = output.toDataURL("image/jpeg", 0.94);
+
   a.click();
 });
 
-window.addEventListener('resize',fitCanvas);
+// ===============================
+// মোবাইল ও কম্পিউটারের প্রিভিউ
+// ===============================
+
+function fitCanvas() {
+
+  const rect = canvas.getBoundingClientRect();
+  const ratio = window.devicePixelRatio || 1;
+
+  const size = Math.round(rect.width * ratio);
+
+  canvas.width = size;
+  canvas.height = size;
+
+  draw();
+}
+
+window.addEventListener("resize", fitCanvas);
+
 fitCanvas();
-</body></html>
+
+</script>
+</body>
+</html>
