@@ -62,31 +62,17 @@ let dragging=false, lastX=0, lastY=0;
 const W=1536,H=1536;
 const CX=768,CY=610,RX=485,RY=420;
 
-const frame=new Image();
-frame.onload=()=>{
-  const temp=document.createElement('canvas');
-  temp.width=frame.naturalWidth;
-  temp.height=frame.naturalHeight;
-  const tctx=temp.getContext('2d',{willReadFrequently:true});
-  tctx.drawImage(frame,0,0);
+const frame = new Image();
 
-  const imageData=tctx.getImageData(0,0,temp.width,temp.height);
-  const data=imageData.data;
+frame.onload = function() {
+  draw();
+};
 
-  for(let y=0;y<temp.height;y++){
-    for(let x=0;x<temp.width;x++){
-      const dx=(x-CX)/490;
-      const dy=(y-CY)/430;
-      const inside=dx*dx+dy*dy<1;
+frame.onerror = function() {
+  alert("ফ্রেমের ছবি লোড হচ্ছে না। frame.png ফাইলটি পরীক্ষা করুন।");
+};
 
-      const i=(y*temp.width+x)*4;
-      const r=data[i],g=data[i+1],b=data[i+2];
-      const white=r>238 && g>238 && b>238 &&
-        Math.max(r,g,b)-Math.min(r,g,b)<20;
-
-      if(inside && white) data[i+3]=0;
-    }
-  }
+frame.src = './frame.png';
 
   tctx.putImageData(imageData,0,0);
   processedFrame=temp;
