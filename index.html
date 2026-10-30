@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#16852b">
+<title>প্রশিক্ষণ সম্মেলন ২০২৬ — ফটোকার্ড</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f2f8ef;color:#17351d;font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif}
+main{max-width:620px;margin:auto;padding:22px 15px 36px}
+header{text-align:center;margin:5px 0 18px}h1{font-size:25px;margin:0 0 7px;color:#14762a}p{margin:0;color:#55705a;font-size:14px;line-height:1.6}
+.panel{background:white;border:1px solid #dcebd9;border-radius:18px;padding:15px;box-shadow:0 5px 22px #245b2410}
+input[type=file]{display:block;width:100%;padding:12px;border:1px dashed #91bd8d;border-radius:12px;background:#f8fcf6}
+.preview{margin:14px auto 10px;max-width:100%;width:100%;display:block;border-radius:12px;background:#f7faf5}
+.controls{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin:12px 0}
+label{font-size:14px;font-weight:600}input[type=range]{width:100%;accent-color:#16852b}
+button{border:0;border-radius:12px;padding:13px 16px;font-size:16px;font-weight:700;cursor:pointer}
+.primary{width:100%;background:#16852b;color:white}.secondary{background:#e9f4e7;color:#176a27}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+button:disabled{opacity:.45;cursor:not-allowed}
+.hint{font-size:12px;color:#657b68;margin-top:9px}
+footer{text-align:center;margin-top:16px;font-size:12px;color:#728573}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>প্রশিক্ষণ সম্মেলন ২০২৬</h1>
+<p>আপনার ছবি যোগ করে নিজের ফটোকার্ড তৈরি করুন</p>
+</header>
+<section class="panel">
+<input id="upload" type="file" accept="image/*">
+<canvas id="canvas" class="preview" width="768" height="768" aria-label="ফটোকার্ড প্রিভিউ"></canvas>
+<div class="controls">
+<label for="zoom">ছবির জুম</label><span id="zoomValue">1.0×</span>
+<input id="zoom" type="range" min="1" max="2.5" step=".01" value="1" style="grid-column:1/3">
+</div>
+<p class="hint">ছবিটি প্রিভিউয়ের ওপর আঙুল/মাউস দিয়ে টেনে নিজের মতো করে বসান। জুম স্লাইডার দিয়ে আকার ঠিক করুন।</p>
+<div class="actions">
+<button class="secondary" id="reset" disabled>ছবি ঠিক করুন</button>
+<button class="secondary" id="clear" disabled>ছবি বদলান</button>
+</div>
+<button class="primary" id="download" disabled style="margin-top:10px">ফটোকার্ড ডাউনলোড করুন</button>
+<p class="hint">আপনার ছবি এই ডিভাইসের ব্রাউজারেই প্রসেস হয়; কোনো সার্ভারে আপলোড করা হয় না।</p>
+</section>
+<footer>প্রশিক্ষণ সম্মেলন ২০২৬</footer>
+</main>
+<script>
+const upload=document.getElementById('upload'), canvas=document.getElementById('canvas'), ctx=canvas.getContext('2d');
+const zoom=document.getElementById('zoom'), zoomValue=document.getElementById('zoomValue');
+const download=document.getElementById('download'), reset=document.getElementById('reset'), clear=document.getElementById('clear');
+const frame=new Image(); frame.src='frame.png';
+const logo=new Image(); logo.src='logo-clear.png';
+let photo=null, scale=1, baseScale=1, offsetX=0, offsetY=0, dragging=false, lastX=0, lastY=0;
+const W=1536,H=1536, CX=768,CY=700,RX=535,RY=525;
+function draw(){
+ const cw=canvas.width,ch=canvas.height; ctx.clearRect(0,0,cw,ch);
+ // Scale design coordinates into preview canvas.
+ ctx.save(); ctx.scale(cw/W,ch/H);
+ if(photo){
+   ctx.save(); ctx.beginPath(); ctx.ellipse(CX,CY,RX,RY,0,0,Math.PI*2); ctx.clip();
+   const cover=Math.max(W/photo.width,H/photo.height)*.70;
+   const s=cover*scale;
+   const dw=photo.width*s, dh=photo.height*s;
+   const dx=(W-dw)/2+offsetX, dy=(H-dh)/2+offsetY;
+   ctx.drawImage(photo,dx,dy,dw,dh); ctx.restore();
+ }
+ if(frame.complete && frame.naturalWidth) ctx.drawImage(frame,0,0,W,H);
+ if(logo.complete && logo.naturalWidth) ctx.drawImage(logo,0,0,400,400);
+ ctx.restore();
+}
+function fitCanvas(){
+ const box=canvas.getBoundingClientRect();
+ const ratio=window.devicePixelRatio||1;
+ const size=Math.min(900,Math.max(320,Math.round(box.width*ratio)));
+ canvas.width=size; canvas.height=size; draw();
+}
+frame.onload=draw; logo.onload=draw;
+upload.addEventListener('change',e=>{
+ const file=e.target.files&&e.target.files[0]; if(!file)return;
+ if(!file.type.startsWith('image/')){alert('অনুগ্রহ করে একটি ছবি নির্বাচন করুন।');return;}
+ const url=URL.createObjectURL(file), img=new Image();
+ img.onload=()=>{photo=img;scale=1;offsetX=0;offsetY=0;zoom.value=1;zoomValue.textContent='1.0×';download.disabled=false;reset.disabled=false;clear.disabled=false;draw();URL.revokeObjectURL(url);};
+ img.onerror=()=>{alert('ছবিটি খোলা যাচ্ছে না। অন্য ছবি দিন।');URL.revokeObjectURL(url);};
+ img.src=url;
+});
+zoom.addEventListener('input',()=>{scale=Number(zoom.value);zoomValue.textContent=scale.toFixed(1)+'×';draw();});
+function point(e){const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*canvas.width/r.width*(W/canvas.width),y:(e.clientY-r.top)*canvas.height/r.height*(H/canvas.height)};}
+canvas.addEventListener('pointerdown',e=>{if(!photo)return;dragging=true;canvas.setPointerCapture(e.pointerId);const p=point(e);lastX=p.x;lastY=p.y;});
+canvas.addEventListener('pointermove',e=>{if(!dragging)return;const p=point(e);offsetX+=(p.x-lastX);offsetY+=(p.y-lastY);lastX=p.x;lastY=p.y;draw();});
+canvas.addEventListener('pointerup',()=>dragging=false);canvas.addEventListener('pointercancel',()=>dragging=false);
+reset.addEventListener('click',()=>{scale=1;offsetX=0;offsetY=0;zoom.value=1;zoomValue.textContent='1.0×';draw();});
+clear.addEventListener('click',()=>{photo=null;upload.value='';download.disabled=true;reset.disabled=true;clear.disabled=true;draw();});
+download.addEventListener('click',()=>{
+ if(!photo)return;
+ const a=document.createElement('a');a.download='training-conference-2026-photocard.jpg';
+ a.href=canvas.toDataURL('image/jpeg',.94);a.click();
+});
+window.addEventListener('resize',fitCanvas);fitCanvas();
+</script>
+</body></html>
